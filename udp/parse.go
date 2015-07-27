@@ -34,7 +34,6 @@ func (l *lexer) run() {
 	if l.err == nil && l.m.Sampling == 0 {
 		l.m.Sampling = float32(1)
 	}
-
 }
 
 var (
@@ -99,6 +98,7 @@ func lexValue(l *lexer) stateFn {
 
 // lex the modifier
 func lexModifier(l *lexer) stateFn {
+	// todo: make it more general for more types.
 	b := l.next()
 	switch b {
 	case 'g':

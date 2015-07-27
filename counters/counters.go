@@ -28,6 +28,7 @@ func (c *Counters) Add(metric *common.Metric) {
 func (c *Counters) Process(buffer *bytes.Buffer, now int64, interval int) int64 {
 	var num int64
 	for key, val := range c.values {
+		// The value is amortized to the interval, the default value of which is 10s, evenly.
 		val := val / float64(interval)
 		fmt.Fprintf(buffer, "%s %f %d\n", m20.DeriveCount(key, c.prefixRates), val, now)
 		num++

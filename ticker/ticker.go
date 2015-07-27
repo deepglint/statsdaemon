@@ -23,6 +23,8 @@ func main() {
 // minute. Note that in my testing this is about .0001 to 0.0002 seconds off due
 // to scheduling etc.
 func GetAlignedTicker(period time.Duration) *time.Ticker {
+	// This ticker is not correct for repeatedly ticking.
+	// The library use it only once for each new ticker.
 	unix := time.Now().UnixNano()
 	diff := time.Duration(period - (time.Duration(unix) % period))
 	return time.NewTicker(diff)

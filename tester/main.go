@@ -39,7 +39,10 @@ func main() {
 		defer pprof.WriteHeapProfile(f)
 	}
 
-	cl := statsd.NewClient(true, "localhost", 8125, "statsd-tester")
+	cl, err := statsd.NewClient(true, "localhost:8125", "statsd-tester")
+	if nil != err {
+		panic(err)
+	}
 	laddr, err := net.ResolveTCPAddr("tcp", "localhost:2003")
 	if nil != err {
 		panic(err)

@@ -18,14 +18,13 @@ const (
 // note that *Metric can be nil when the line was valid (if the line was empty)
 // input format: key:value|modifier[|@samplerate]
 func ParseLine(line []byte) (metric *common.Metric, err error) {
+	// todo: modify this function to use regex.
 	if len(line) == 0 {
 		return nil, nil
 	}
-	parts := bytes.SplitN(bytes.TrimSpace(line), []byte(":"), 2)
+	parts := bytes.SplitN(bytes.TrimSpace(line), []byte(":"), -1)
+	// If there are more than two colons, return error.
 	if len(parts) != 2 {
-		return nil, errors.New("bad amount of colons")
-	}
-	if bytes.Contains(parts[1], []byte(":")) {
 		return nil, errors.New("bad amount of colons")
 	}
 	bucket := parts[0]
@@ -37,6 +36,7 @@ func ParseLine(line []byte) (metric *common.Metric, err error) {
 		return nil, errors.New("bad amount of pipes")
 	}
 	modifier := string(parts[1])
+	// todo: put modifiers in a global set so that adding/removing modifiers would be much easy.
 	if modifier != "g" && modifier != "c" && modifier != "ms" {
 		return nil, errors.New("unsupported metric type")
 	}

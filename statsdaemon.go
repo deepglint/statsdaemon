@@ -8,9 +8,9 @@ import (
 	"github.com/vimeo/statsdaemon/common"
 	"github.com/vimeo/statsdaemon/counters"
 	"github.com/vimeo/statsdaemon/gauges"
+	"github.com/vimeo/statsdaemon/ticker"
 	"github.com/vimeo/statsdaemon/timers"
 	"github.com/vimeo/statsdaemon/udp"
-	"github.com/vimeo/statsdaemon/ticker"
 	"io"
 	"log"
 	"net"
@@ -36,8 +36,8 @@ type StatsDaemon struct {
 	prefix_gauges       string
 	pct                 timers.Percentiles
 	flushInterval       int
-    max_unprocessed int
-    max_timers_per_s    uint64
+	max_unprocessed     int
+	max_timers_per_s    uint64
 	signalchan          chan os.Signal
 	Metrics             chan *common.Metric
 	metricAmounts       chan common.MetricAmount
@@ -60,8 +60,8 @@ func New(instance, listen_addr, admin_addr, graphite_addr, prefix_rates, prefix_
 		prefix_gauges,
 		pct,
 		flushInterval,
-        max_unprocessed,
-        max_timers_per_s,
+		max_unprocessed,
+		max_timers_per_s,
 		signalchan,
 		make(chan *common.Metric, max_unprocessed),
 		make(chan common.MetricAmount, max_unprocessed),
@@ -135,9 +135,11 @@ func (s *StatsDaemon) metricsMonitor() {
 			} else if m.Modifier == "g" {
 				g.Add(m)
 				name = "gauge"
-			} else {
+			} else if m.Modifier == "c" {
 				c.Add(m)
 				name = "counter"
+			} else {
+				name = "unknown"
 			}
 			c.Add(&common.Metric{
 				Bucket:   fmt.Sprintf("%sdirection_is_in.statsd_type_is_%s.target_type_is_count.unit_is_Metric", s.prefix, name),
@@ -174,6 +176,7 @@ func (s *StatsDaemon) submit(c *counters.Counters, g *gauges.Gauges, t *timers.T
 	// TODO: in future, buffer up data (with a TTL/max size) and submit later
 	client, err := net.Dial("tcp", s.graphite_addr)
 	if err != nil {
+		// todo: remove these
 		c.Process(&buffer, now, s.flushInterval)
 		g.Process(&buffer, now, s.flushInterval)
 		t.Process(&buffer, now, s.flushInterval)
@@ -239,7 +242,9 @@ type Amounts struct {
 // upon incoming requests we use the "old" buffer and the new one for the timeperiod it applies to.
 // (this way we have the absolute latest information)
 func (s *StatsDaemon) metricStatsMonitor() {
-	period := 10 * time.Second
+	// todo: change this to a configuarable variable
+	countInterval := 10
+	period := time.Duration(countInterval) * time.Second
 	tick := time.NewTicker(period)
 	// use two maps so we always have enough data shortly after we start a new period
 	// counts would be too low and/or too inaccurate otherwise
@@ -289,7 +294,7 @@ func (s *StatsDaemon) metricStatsMonitor() {
 				// this needs to be less realtime, so for simplicity (and performance?) we just use the prev 10s bucket.
 			case "metric_stats":
 				for bucket, el := range *prev_counts {
-					fmt.Fprintf(&resp, "%s %f %f\n", bucket, float64(el.Submitted)/10, float64(el.Seen)/10)
+					fmt.Fprintf(&resp, "%s %f %f\n", bucket, float64(el.Submitted)/float64(countInterval), float64(el.Seen)/float64(countInterval))
 				}
 			}
 

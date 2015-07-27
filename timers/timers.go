@@ -120,11 +120,12 @@ func (timers *Timers) Process(buffer *bytes.Buffer, now int64, interval int) int
 					if pct.float >= 0 {
 						sum_pct = cumulativeValues[indexOfPerc-1]
 						maxAtThreshold = t.Points[indexOfPerc-1]
+						mean_pct = float64(sum_pct) / float64(indexOfPerc)
 					} else {
 						maxAtThreshold = t.Points[indexOfPerc]
 						sum_pct = cumulativeValues[seen-1] - cumulativeValues[seen-indexOfPerc-1]
+						mean_pct = float64(sum_pct) / float64(seen-indexOfPerc)
 					}
-					mean_pct = float64(sum_pct) / float64(indexOfPerc)
 				}
 
 				var pctstr string
