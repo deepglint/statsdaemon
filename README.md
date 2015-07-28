@@ -5,7 +5,7 @@ Metrics aggregation daemon like [statsd](https://github.com/etsy/statsd), in Go 
 (Based on code from [Bitly's statsdaemon](https://github.com/bitly/statsdaemon))
 
 [![Build Status](https://secure.travis-ci.org/vimeo/statsdaemon.png)](http://travis-ci.org/vimeo/statsdaemon)
-[![GoDoc](https://godoc.org/github.com/vimeo/statsdaemon?status.png)](https://godoc.org/github.com/vimeo/statsdaemon)
+[![GoDoc](https://godoc.org/github.com/deepglint/statsdaemon?status.png)](https://godoc.org/github.com/deepglint/statsdaemon)
 
 
 Features you expect:
@@ -25,7 +25,7 @@ Metrics 2.0
 
 [metrics 2.0](http://dieter.plaetinck.be/metrics_2_a_proposal.html) is a format for structured, self-describing, standardized metrics.
 
-![metrics 2.0 diagram](https://raw.github.com/vimeo/statsdaemon/master/img/metrics2.0-processor.png)
+![metrics 2.0 diagram](https://raw.github.com/deepglint/statsdaemon/master/img/metrics2.0-processor.png)
 
 Metrics that flow through statsdaemon and are detected to be in the metrics 2.0 format undergo the same operations and aggregations, but how this is reflected in the resulting metric identifier is different:
 
@@ -46,7 +46,7 @@ You'll love Go
 Perhaps debatable and prone to personal opinion, but people seem to agree that Go is more robust, easier to deploy and elegant than node.js.
 In terms of performance, I didn't do extensive or scientific benchmarking but here's the effect on our cpu usage and calculation time when switching from statsd to statsdaemon, with the same input load and the same things being calculated:
 
-![Performance](https://raw.github.com/vimeo/statsdaemon/master/img/statsd-to-statsdaemon-switch.png)
+![Performance](https://raw.github.com/deepglint/statsdaemon/master/img/statsd-to-statsdaemon-switch.png)
 
 Performance and profiling
 =========================
@@ -94,7 +94,7 @@ Installing
 ==========
 
 ```bash
-go get github.com/Vimeo/statsdaemon
+go get github.com/deepglint/statsdaemon
 ```
 
 Command Line Options

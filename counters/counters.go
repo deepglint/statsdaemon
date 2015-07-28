@@ -3,8 +3,8 @@ package counters
 import (
 	"bytes"
 	"fmt"
+	"github.com/deepglint/statsdaemon/common"
 	m20 "github.com/metrics20/go-metrics20"
-	"github.com/vimeo/statsdaemon/common"
 )
 
 type Counters struct {

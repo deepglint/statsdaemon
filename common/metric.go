@@ -7,6 +7,8 @@ type Metric struct {
 	Sampling float32
 	//optional, only for "archive" metrics
 	Time uint32
+	// If the gauge is delta.
+	IsDelta bool
 }
 
 // MetricAmount tracks amounts of metrics.

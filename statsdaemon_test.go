@@ -3,11 +3,11 @@ package statsdaemon
 import (
 	"bytes"
 	"github.com/bmizerany/assert"
-	"github.com/vimeo/statsdaemon/common"
-	"github.com/vimeo/statsdaemon/counters"
-	"github.com/vimeo/statsdaemon/gauges"
-	"github.com/vimeo/statsdaemon/timers"
-	"github.com/vimeo/statsdaemon/udp"
+	"github.com/deepglint/statsdaemon/common"
+	"github.com/deepglint/statsdaemon/counters"
+	"github.com/deepglint/statsdaemon/gauges"
+	"github.com/deepglint/statsdaemon/timers"
+	"github.com/deepglint/statsdaemon/udp"
 	"regexp"
 	"strings"
 	"testing"
@@ -24,6 +24,24 @@ func TestPacketParse(t *testing.T) {
 	packet := packets[0]
 	assert.Equal(t, "gaugor", packet.Bucket)
 	assert.Equal(t, float64(333), packet.Value)
+	assert.Equal(t, "g", packet.Modifier)
+	assert.Equal(t, float32(1), packet.Sampling)
+
+	d = []byte("gaugor:+333|g")
+	packets = udp.ParseMessage(d, prefix_internal, output, udp.ParseLine)
+	assert.Equal(t, len(packets), 1)
+	packet = packets[0]
+	assert.Equal(t, "gaugor", packet.Bucket)
+	assert.Equal(t, float64(333), packet.Value)
+	assert.Equal(t, "g", packet.Modifier)
+	assert.Equal(t, float32(1), packet.Sampling)
+
+	d = []byte("gaugor:-111|g")
+	packets = udp.ParseMessage(d, prefix_internal, output, udp.ParseLine)
+	assert.Equal(t, len(packets), 1)
+	packet = packets[0]
+	assert.Equal(t, "gaugor", packet.Bucket)
+	assert.Equal(t, float64(-111), packet.Value)
 	assert.Equal(t, "g", packet.Modifier)
 	assert.Equal(t, float32(1), packet.Sampling)
 
@@ -98,6 +116,27 @@ func TestPacketParse(t *testing.T) {
 	packets = udp.ParseMessage(d, prefix_internal, output, udp.ParseLine)
 	assert.Equal(t, len(packets), 1)
 	assert.Equal(t, packets[0].Bucket, errors_key)
+}
+
+func TestGauge(t *testing.T) {
+	// Some data with expected mean of 20
+	d := []byte("response_time:100|g\nresponse_time:+30|g\nresponse_time:-20|g")
+	packets := udp.ParseMessage(d, prefix_internal, output, udp.ParseLine)
+
+	ti := gauges.New("")
+
+	for _, p := range packets {
+		ti.Add(p)
+	}
+	var buff bytes.Buffer
+	num := ti.Process(&buff, time.Now().Unix(), 60)
+	assert.Equal(t, num, int64(1))
+	dataForGraphite := buff.String()
+	pattern := `response_time 110\.[0-9]+ `
+	meanRegexp := regexp.MustCompile(pattern)
+
+	matched := meanRegexp.MatchString(dataForGraphite)
+	assert.Equal(t, matched, true)
 }
 
 func TestMean(t *testing.T) {

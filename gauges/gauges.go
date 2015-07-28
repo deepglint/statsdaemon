@@ -3,8 +3,8 @@ package gauges
 import (
 	"bytes"
 	"fmt"
+	"github.com/deepglint/statsdaemon/common"
 	m20 "github.com/metrics20/go-metrics20"
-	"github.com/vimeo/statsdaemon/common"
 )
 
 type Gauges struct {
@@ -21,7 +21,11 @@ func New(prefix string) *Gauges {
 
 // Add updates the gauges with the latest value for given key
 func (g *Gauges) Add(metric *common.Metric) {
-	g.values[metric.Bucket] = metric.Value
+	if !metric.IsDelta {
+		g.values[metric.Bucket] = metric.Value
+	} else {
+		g.values[metric.Bucket] += metric.Value
+	}
 }
 
 // Process puts gauges in the outbound buffer

@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/vimeo/statsdaemon/timers"
-	"github.com/vimeo/statsdaemon"
+	"github.com/deepglint/statsdaemon"
+	"github.com/deepglint/statsdaemon/timers"
 	"log"
 	"os"
 	"os/signal"
@@ -58,6 +58,7 @@ func expand_cfg_vars(in string) (out string) {
 		return ""
 	}
 }
+
 func main() {
 	flag.Parse()
 

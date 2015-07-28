@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/deepglint/statsdaemon/common"
+	"github.com/deepglint/statsdaemon/counters"
+	"github.com/deepglint/statsdaemon/gauges"
+	"github.com/deepglint/statsdaemon/ticker"
+	"github.com/deepglint/statsdaemon/timers"
+	"github.com/deepglint/statsdaemon/udp"
 	"github.com/tv42/topic"
-	"github.com/vimeo/statsdaemon/common"
-	"github.com/vimeo/statsdaemon/counters"
-	"github.com/vimeo/statsdaemon/gauges"
-	"github.com/vimeo/statsdaemon/ticker"
-	"github.com/vimeo/statsdaemon/timers"
-	"github.com/vimeo/statsdaemon/udp"
 	"io"
 	"log"
 	"net"
@@ -133,6 +133,9 @@ func (s *StatsDaemon) metricsMonitor() {
 				t.Add(m)
 				name = "timer"
 			} else if m.Modifier == "g" {
+				if m.IsDelta {
+					log.Fatal("delta gauge:", m)
+				}
 				g.Add(m)
 				name = "gauge"
 			} else if m.Modifier == "c" {

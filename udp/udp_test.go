@@ -2,7 +2,7 @@ package udp
 
 import (
 	"errors"
-	"github.com/vimeo/statsdaemon/common"
+	"github.com/deepglint/statsdaemon/common"
 	"reflect"
 	"testing"
 )
@@ -25,6 +25,31 @@ func runTest(t *testing.T, f func([]byte) (*common.Metric, error)) {
 				Value:    78186,
 				Modifier: "g",
 				Sampling: float32(1),
+				IsDelta:  false,
+			},
+			nil,
+		},
+		Case{
+			"gauge-delta-positive",
+			"search.solr.clips.results:+1000|g",
+			&common.Metric{
+				Bucket:   "search.solr.clips.results",
+				Value:    1000,
+				Modifier: "g",
+				Sampling: float32(1),
+				IsDelta:  true,
+			},
+			nil,
+		},
+		Case{
+			"gauge-delta-negtive",
+			"search.solr.clips.results:-78186|g",
+			&common.Metric{
+				Bucket:   "search.solr.clips.results",
+				Value:    -78186,
+				Modifier: "g",
+				Sampling: float32(1),
+				IsDelta:  true,
 			},
 			nil,
 		},

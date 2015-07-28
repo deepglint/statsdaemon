@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/vimeo/statsdaemon/common"
+	"github.com/deepglint/statsdaemon/common"
 	"log"
 	"net"
 	"strconv"
@@ -55,11 +55,13 @@ func ParseLine(line []byte) (metric *common.Metric, err error) {
 	if err != nil {
 		return nil, err
 	}
+	isDelta := parts[0][0] == '+' || parts[0][0] == '-'
 	metric = &common.Metric{
 		Bucket:   string(bucket),
 		Value:    value,
 		Modifier: modifier,
 		Sampling: float32(sampleRate),
+		IsDelta:  isDelta,
 	}
 	return metric, nil
 }
@@ -81,6 +83,7 @@ func ParseMessage(data []byte, prefix_internal string, output *common.Output, pa
 				"c",
 				float32(1),
 				0,
+				false,
 			}
 		} else {
 			// data will be repurposed by the udpListener

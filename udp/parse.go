@@ -2,7 +2,7 @@ package udp
 
 import (
 	"errors"
-	"github.com/vimeo/statsdaemon/common"
+	"github.com/deepglint/statsdaemon/common"
 	"strconv"
 )
 
@@ -90,6 +90,9 @@ func lexValue(l *lexer) stateFn {
 	if err != nil {
 		l.err = err
 		return nil
+	}
+	if l.input[l.start] == '+' || l.input[l.start] == '-' {
+		l.m.IsDelta = true
 	}
 	l.m.Value = v
 	l.start = l.pos
